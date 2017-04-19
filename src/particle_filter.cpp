@@ -1,8 +1,8 @@
 /*
  * particle_filter.cpp
  *
- *  Created on: Dec 12, 2016
- *      Author: Tiffany Huang
+ *  Created on: April 18, 2017
+ *      Author: Maurice Loskyll
  */
 
 #include <random>
@@ -33,9 +33,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         particle.weight = 1;
         particles.push_back(particle);
     }
-    
     is_initialized = true;
-    
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
