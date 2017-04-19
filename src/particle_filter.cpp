@@ -1,8 +1,8 @@
 /*
  * particle_filter.cpp
  *
- *  Created on: April 18, 2017
- *      Author: Maurice Loskyll
+ *  Created on: Dec 12, 2016
+ *      Author: Tiffany Huang
  */
 
 #include <random>
@@ -33,7 +33,9 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         particle.weight = 1;
         particles.push_back(particle);
     }
-    is_initialized = true; 
+    
+    is_initialized = true;
+    
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
@@ -73,8 +75,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], v
             double cos_theta = cos(particles[i].theta);
             double sin_theta = sin(particles[i].theta);
             
-            transformed_obs_x = particles[i].x + (observations[j].x * cos_theta) - (observations[j].y * sin_theta);
-            transformed_obs_y = particles[i].y + (observations[j].x * sin_theta) + (observations[j].y * cos_theta);
+            transformed_obs_x = observations[j].x * cos_theta - observations[j].y * sin_theta + particles[i].x;
+            transformed_obs_y = observations[j].y * cos_theta + observations[j].x * sin_theta + particles[i].y;
             
             Map::single_landmark_s nearest_landmark;
             double min_distance = sensor_range;
