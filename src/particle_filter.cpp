@@ -33,6 +33,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
         particle.weight = 1;
         particles.push_back(particle);
     }
+    
     is_initialized = true;
 }
 
@@ -50,11 +51,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
         yaw_rate = 0.0001;
     }
     
-    for (int i = 0; i < num_particles; ++i) {
+    for (auto&& particle : particles){
         
-        particles[i].x += (velocity / yaw_rate) * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta)) + noise_x(generate);
-        particles[i].y += (velocity / yaw_rate) * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t)) + noise_y(generate);
-        particles[i].theta += yaw_rate * delta_t + noise_theta(generate);
+        particle.x += (velocity / yaw_rate) * (sin(particle.theta + yaw_rate * delta_t) - sin(particle.theta)) + noise_x(generate);
+        particle.y += (velocity / yaw_rate) * (cos(particle.theta) - cos(particle.theta + yaw_rate * delta_t)) + noise_y(generate);
+        particle.theta += yaw_rate * delta_t + noise_theta(generate);
     }
 }
 
@@ -114,24 +115,18 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], v
 
 void ParticleFilter::resample() {
     
-    //Sebastian's Resampling Wheel in C++
+    //resample particles with discrete distribution
     vector<Particle> resampled_particles;
     
     default_random_engine generate;
-    uniform_int_distribution<int> ints(0, num_particles);
-    int index = ints(generate);
-    double beta = 0;
-    double max_weight = *max_element(begin(weights), end(weights));
-    uniform_real_distribution<double> distribution(0, 2 * max_weight);
+    discrete_distribution<> distribution(weights.begin(), weights.end());
     
-    for (int i = 0; i < num_particles; i++) {
-        beta += distribution(generate);
-        while (beta > weights[index]) {
-            beta -= weights[index];
-            index = (index + 1) % num_particles;
-        }
-        resampled_particles.push_back(particles[index]);
+    for (int i = 0; i < num_particles; ++i) {
+        
+        int number = distribution(generate);
+        resampled_particles.push_back(particles[number]);
     }
+    
     particles = resampled_particles;
 }
 
